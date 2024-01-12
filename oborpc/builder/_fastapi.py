@@ -23,14 +23,14 @@ class FastAPIServerBuilder(ServerBuilder):
         class_name: str,
         method_name: str,
         method: Callable
-    ):
+    ): # pylint: disable=too-many-arguments
         @router.post(f"{router.prefix}/{class_name}/{method_name}")
         def final_func(request: Request):
             request_body = asyncio.run(request.body())
             body = json.loads(json.loads(request_body.decode()))
             return self.dispatch_rpc_request(instance, method, body)
 
-    def build_router_from_instance( # pylint: disable=too-many-locals
+    def build_router_from_instance(
         self,
         instance: OBORBase,
         *,
@@ -51,7 +51,7 @@ class FastAPIServerBuilder(ServerBuilder):
         deprecated: Optional[bool] = None,
         include_in_schema: bool = True,
         generate_unique_id_function: Callable[[APIRoute], str] = Default(generate_unique_id),
-    ): # pylint: disable=too-many-arguments
+    ): # pylint: disable=too-many-arguments,too-many-locals
         """
         build FastAPI API Router from oborpc instance
         """
