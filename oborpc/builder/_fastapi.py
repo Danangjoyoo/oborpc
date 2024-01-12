@@ -1,19 +1,21 @@
 """
+FastAPI Server Builder
 """
 import json
 import asyncio
 from enum import Enum
+from typing import Optional, List, Dict, Union, Type, Any, Sequence, Callable
 from fastapi import Request, Response, APIRouter, params
 from fastapi.responses import JSONResponse
 from fastapi.routing import BaseRoute, APIRoute, ASGIApp, Lifespan, Default, generate_unique_id
-from typing import Optional, List, Dict, Union, Type, Any, Sequence, Callable
 from ._server import ServerBuilder
 from ..base.meta import OBORBase
 
-class FastAPIServerBuilder(ServerBuilder):
-    def __init__(self, host, port=None, timeout=1, retry=None):
-        super().__init__(host, port, timeout, retry)
 
+class FastAPIServerBuilder(ServerBuilder):
+    """
+    Dedicated RPC Server Builder for FastAPI
+    """
     def create_remote_responder(
         self,
         instance: OBORBase,
@@ -21,7 +23,7 @@ class FastAPIServerBuilder(ServerBuilder):
         class_name: str,
         method_name: str,
         method: Callable
-    ):
+    ): # pylint: disable=too-many-arguments
         @router.post(f"{router.prefix}/{class_name}/{method_name}")
         def final_func(request: Request):
             request_body = asyncio.run(request.body())
@@ -49,8 +51,9 @@ class FastAPIServerBuilder(ServerBuilder):
         deprecated: Optional[bool] = None,
         include_in_schema: bool = True,
         generate_unique_id_function: Callable[[APIRoute], str] = Default(generate_unique_id),
-    ):
+    ): # pylint: disable=too-many-arguments,too-many-locals
         """
+        build FastAPI API Router from oborpc instance
         """
         router = APIRouter(
             prefix=prefix,
