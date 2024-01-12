@@ -1,7 +1,11 @@
 """
+OBORPC Base Builder
 """
 
 class OBORBuilder():
+    """
+    OBORPC Builder Class
+    """
     __registered_base = set()
 
     def __init__(self, host, port=None, timeout=1, retry=0) -> None:
@@ -20,6 +24,9 @@ class OBORBuilder():
             self.base_url += f":{port}"
 
     def check_has_protocol(self, host: str):
+        """
+        Check whether the given host already defined with protocol or not
+        """
         if host.startswith("http://"):
             return True
         if host.startswith("https://"):
@@ -27,6 +34,9 @@ class OBORBuilder():
         return False
 
     def check_registered_base(self, base: str):
+        """
+        Check whether the base RPC class is already built
+        """
         if base in OBORBuilder.__registered_base:
             raise Exception(f"Failed to build client RPC {base} : base class can only built once")
         OBORBuilder.__registered_base.add(base)

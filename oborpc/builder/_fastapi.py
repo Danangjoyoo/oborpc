@@ -11,6 +11,7 @@ from typing import Optional, List, Dict, Union, Type, Any, Sequence, Callable
 from ._server import ServerBuilder
 from ..base.meta import OBORBase
 
+
 class FastAPIServerBuilder(ServerBuilder):
     def __init__(self, host, port=None, timeout=1, retry=None):
         super().__init__(host, port, timeout, retry)

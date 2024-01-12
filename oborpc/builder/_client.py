@@ -1,4 +1,5 @@
 """
+Client RPC Builder
 """
 import inspect
 import json
@@ -11,7 +12,14 @@ class ClientBuilder(OBORBuilder):
     def __init__(self, host, port=None, timeout=1, retry=0) -> None:
         super().__init__(host, port, timeout, retry)
 
-    def create_remote_caller(self, class_name, method_name, url_prefix, timeout = None, retry = None):
+    def create_remote_caller(
+        self,
+        class_name: str,
+        method_name: str,
+        url_prefix: str,
+        timeout: float = None,
+        retry: int = None
+    ):
         def remote_call(*args, **kwargs):
             try:
                 t0 = time.time()
