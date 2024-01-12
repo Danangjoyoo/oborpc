@@ -19,7 +19,7 @@ class OBORMeta(type):
         return cls
 
 
-class OBORBase(metaclass=OBORMeta):
+class OBORBase(metaclass=OBORMeta): # pylint: disable=too-few-public-methods
     """
     Obor Base Class
     """
