@@ -29,8 +29,8 @@ class ClientBuilder(OBORBuilder):
             """
             remote call wrapper
             """
+            start_time = time.time()
             try:
-                start_time = time.time()
                 data = {
                     "args": args[1:],
                     "kwargs": kwargs
@@ -61,7 +61,7 @@ class ClientBuilder(OBORBuilder):
 
             finally:
                 elapsed = f"{(time.time() - start_time) * 1000}:.2f"
-                logging.debug("[RPC-Clientt] remote call take %s ms" % elapsed)
+                logging.debug("[RPC-Clientt] remote call take %s ms", elapsed)
 
         return remote_call
 
