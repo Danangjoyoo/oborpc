@@ -57,14 +57,18 @@ class ClientBuilder(OBORBuilder):
                 if isinstance(e, RPCCallException):
                     raise e
                 msg = f"rpc call failed method={method_name} : {e}"
-                raise RPCCallException(msg)
+                raise RPCCallException(msg) from e
 
             finally:
-                logging.debug(f"[RPC-Clientt] remote call take {(time.time() - start_time) * 1000:.2f} ms")
+                elapsed = f"{(time.time() - start_time) * 1000}:.2f"
+                logging.debug("[RPC-Clientt] remote call take %s ms" % elapsed)
 
         return remote_call
 
-    def setup_client_rpc(self, instance: object, url_prefix: str = ""):
+    def build_client_rpc(self, instance: object, url_prefix: str = ""):
+        """
+        Setup client rpc
+        """
         _class = instance.__class__
         iterator_class = _class
 

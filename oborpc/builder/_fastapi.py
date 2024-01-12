@@ -4,10 +4,10 @@ FastAPI Server Builder
 import json
 import asyncio
 from enum import Enum
+from typing import Optional, List, Dict, Union, Type, Any, Sequence, Callable
 from fastapi import Request, Response, APIRouter, params
 from fastapi.responses import JSONResponse
 from fastapi.routing import BaseRoute, APIRoute, ASGIApp, Lifespan, Default, generate_unique_id
-from typing import Optional, List, Dict, Union, Type, Any, Sequence, Callable
 from ._server import ServerBuilder
 from ..base.meta import OBORBase
 
@@ -30,7 +30,7 @@ class FastAPIServerBuilder(ServerBuilder):
             body = json.loads(json.loads(request_body.decode()))
             return self.dispatch_rpc_request(instance, method, body)
 
-    def build_router_from_instance(
+    def build_router_from_instance( # pylint: disable=too-many-locals
         self,
         instance: OBORBase,
         *,

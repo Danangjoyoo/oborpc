@@ -30,7 +30,7 @@ class ServerBuilder(OBORBuilder):
         """
         _class = instance.__class__
         iterator_class = instance.__class__.__base__
-        method_map = {
+        method_map = { # pylint: disable=unnecessary-comprehension
             name: method for (name, method) in inspect.getmembers(
                 _class, predicate=inspect.isfunction
             )
