@@ -39,5 +39,6 @@ class OBORBuilder():
         Check whether the base RPC class is already built
         """
         if base in OBORBuilder.__registered_base:
-            raise OBORPCBuildException(f"Failed to build client RPC {base} : base class can only built once")
+            msg = f"Failed to build client RPC {base} : base class can only built once"
+            raise OBORPCBuildException(msg)
         OBORBuilder.__registered_base.add(base)

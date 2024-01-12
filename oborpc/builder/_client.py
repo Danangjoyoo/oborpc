@@ -10,6 +10,9 @@ from ..exception import RPCCallException
 
 
 class ClientBuilder(OBORBuilder):
+    """
+    Client Builder
+    """
     def __init__(self, host, port=None, timeout=1, retry=0) -> None:
         super().__init__(host, port, timeout, retry)
 
@@ -21,6 +24,8 @@ class ClientBuilder(OBORBuilder):
         timeout: float = None,
         retry: int = None
     ):
+        """
+        """
         def remote_call(*args, **kwargs):
             try:
                 t0 = time.time()
