@@ -6,9 +6,10 @@ from typing import Callable
 
 def procedure(fun: Callable):
     """
-    Marks the method with this decorator to make it available for RPC within the class with
-    direct inheritance with `OBORBase`.
-    To make it works also make sure the method is overridden in the server class inheritance of the base class
+    Marks the method with this decorator to make it available
+    for RPC within the class with direct inheritance with `OBORBase`.
+    To make it works also make sure the method is overridden
+    in the server class inheritance of the base class
 
     from oborpc.base import meta
     from oborpc.decorator import procedure

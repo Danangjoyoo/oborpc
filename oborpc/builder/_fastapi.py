@@ -51,7 +51,7 @@ class FastAPIServerBuilder(ServerBuilder):
         deprecated: Optional[bool] = None,
         include_in_schema: bool = True,
         generate_unique_id_function: Callable[[APIRoute], str] = Default(generate_unique_id),
-    ):
+    ): # pylint: disable=too-many-arguments
         """
         build FastAPI API Router from oborpc instance
         """
