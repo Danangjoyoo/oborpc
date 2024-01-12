@@ -1,18 +1,28 @@
 """
+Flask Server Builder
 """
 import functools
 import json
 import os
+from typing import Callable
 from flask import request as flask_request, Blueprint
 from ._server import ServerBuilder
 from ..base.meta import OBORBase
 
 class FlaskServerBuilder(ServerBuilder):
+    """
+    RPC Server Builder for Flask
+    """
     def __init__(self, host, port=None, timeout=1, retry=None):
         super().__init__(host, port, timeout, retry)
 
     def create_remote_responder(
-        self, instance: OBORBase, router: Blueprint, class_name, method_name, method
+        self,
+        instance: OBORBase,
+        router: Blueprint,
+        class_name: str,
+        method_name: str,
+        method: Callable
     ):
         def create_modified_func():
             @functools.wraps(method)
@@ -41,6 +51,7 @@ class FlaskServerBuilder(ServerBuilder):
         cli_group: str | None = object()
     ):
         """
+        build Flask blueprint from oborpc instance
         """
         blueprint = Blueprint(
             blueprint_name,

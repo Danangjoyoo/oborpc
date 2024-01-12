@@ -1,4 +1,5 @@
 """
+FastAPI Server Builder
 """
 import json
 import asyncio
@@ -51,6 +52,7 @@ class FastAPIServerBuilder(ServerBuilder):
         generate_unique_id_function: Callable[[APIRoute], str] = Default(generate_unique_id),
     ):
         """
+        build FastAPI API Router from oborpc instance
         """
         router = APIRouter(
             prefix=prefix,
