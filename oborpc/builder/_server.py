@@ -1,14 +1,15 @@
 """
+Server Builder Base
 """
 import inspect
 from ._base import OBORBuilder
 
 
 class ServerBuilder(OBORBuilder):
-    def __init__(self, host, port=None, timeout=1, retry=0) -> None:
-        super().__init__(host, port, timeout, retry)
-
-    def create_remote_responder(self, instance, router, class_name, method_name, method):
+    """
+    Server Builder
+    """
+    def create_remote_responder(self, instance, router, class_name, method_name, method): # pylint: disable=too-many-arguments
         """
         Remote RPC Request Responder
         """
@@ -38,4 +39,7 @@ class ServerBuilder(OBORBuilder):
         for (name, method) in inspect.getmembers(iterator_class, predicate=inspect.isfunction):
             if name not in iterator_class.__oborprocedures__:
                 continue
-            self.create_remote_responder(instance, router, iterator_class.__name__, name, method_map.get(name))
+            self.create_remote_responder(
+                instance, router, iterator_class.__name__,
+                name, method_map.get(name)
+            )

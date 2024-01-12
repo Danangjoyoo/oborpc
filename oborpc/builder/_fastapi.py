@@ -13,9 +13,9 @@ from ..base.meta import OBORBase
 
 
 class FastAPIServerBuilder(ServerBuilder):
-    def __init__(self, host, port=None, timeout=1, retry=None):
-        super().__init__(host, port, timeout, retry)
-
+    """
+    Dedicated RPC Server Builder for FastAPI
+    """
     def create_remote_responder(
         self,
         instance: OBORBase,

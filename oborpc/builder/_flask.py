@@ -4,18 +4,15 @@ Flask Server Builder
 import functools
 import json
 import os
-from typing import Callable
+from typing import Callable, Union
 from flask import request as flask_request, Blueprint
 from ._server import ServerBuilder
 from ..base.meta import OBORBase
 
 class FlaskServerBuilder(ServerBuilder):
     """
-    RPC Server Builder for Flask
+    Dedicated RPC Server Builder for Flask
     """
-    def __init__(self, host, port=None, timeout=1, retry=None):
-        super().__init__(host, port, timeout, retry)
-
     def create_remote_responder(
         self,
         instance: OBORBase,
@@ -41,14 +38,14 @@ class FlaskServerBuilder(ServerBuilder):
         instance: OBORBase,
         blueprint_name: str,
         import_name: str,
-        static_folder: str | os.PathLike | None = None,
-        static_url_path: str | None = None,
-        template_folder: str | os.PathLike | None = None,
-        url_prefix: str | None = None,
-        subdomain: str | None = None,
-        url_defaults: dict | None = None,
-        root_path: str | None = None,
-        cli_group: str | None = object()
+        static_folder: Union[str, os.PathLike, None] = None,
+        static_url_path: Union[str, None] = None,
+        template_folder: Union[str, os.PathLike, None] = None,
+        url_prefix: Union[str, None] = None,
+        subdomain: Union[str, None] = None,
+        url_defaults: Union[dict, None] = None,
+        root_path: Union[str, None] = None,
+        cli_group: Union[str, None] = object()
     ):
         """
         build Flask blueprint from oborpc instance
