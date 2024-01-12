@@ -1,6 +1,7 @@
 """
 OBORPC Base Builder
 """
+from ..exception import OBORPCBuildException
 
 class OBORBuilder():
     """
@@ -38,5 +39,5 @@ class OBORBuilder():
         Check whether the base RPC class is already built
         """
         if base in OBORBuilder.__registered_base:
-            raise Exception(f"Failed to build client RPC {base} : base class can only built once")
+            raise OBORPCBuildException(f"Failed to build client RPC {base} : base class can only built once")
         OBORBuilder.__registered_base.add(base)

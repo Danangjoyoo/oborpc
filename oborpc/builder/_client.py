@@ -6,6 +6,7 @@ import json
 import requests
 import time
 from ._base import OBORBuilder
+from ..exception import RPCCallException
 
 
 class ClientBuilder(OBORBuilder):
@@ -35,13 +36,15 @@ class ClientBuilder(OBORBuilder):
                     timeout=timeout if timeout != None else self.timeout
                 )
                 if not response:
-                    raise Exception(f"rpc call failed method={method_name}")
+                    raise RPCCallException(f"rpc call failed method={method_name}")
                 return response.json().get("data")
             except Exception as e:
                 _retry = retry if retry != None else self.retry
                 if _retry:
                     return remote_call(*args, **kwargs, retry=_retry-1)
-                raise Exception(f"rpc call failed method={method_name}")
+                if isinstance(e, RPCCallException):
+                    raise e
+                raise Exception(f"rpc call failed method={method_name}", e)
             finally:
                 # print("elapsed", time.time() - t0)
                 pass
