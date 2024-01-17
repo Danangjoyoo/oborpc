@@ -22,7 +22,7 @@ class Calculator(meta.OborBase):
         pass
 
 class CalculatorServer(Calculator):
-    def tambah(self, a: int, b: int):
+    def add(self, a: int, b: int):
         print(f"adding {a} and {b}")
         return a+b
 
@@ -72,7 +72,7 @@ class CalculatorServer(Calculator):
     ```
 
 3. Create client, you can create a simple `client.py` or a client application
-    - simple `client.py``
+    - simple `client.py`
     ```
     from oborpc.builder import ClientBuilder
     from calculator import Calculator
