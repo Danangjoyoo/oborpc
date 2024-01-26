@@ -30,6 +30,20 @@ class FastAPIServerBuilder(ServerBuilder):
             body = json.loads(json.loads(request_body.decode()))
             return self.dispatch_rpc_request(instance, method, body)
 
+    def create_remote_responder_async(
+        self,
+        instance: OBORBase,
+        router: APIRouter,
+        class_name: str,
+        method_name: str,
+        method: Callable
+    ): # pylint: disable=too-many-arguments
+        @router.post(f"{router.prefix}/{class_name}/{method_name}")
+        async def final_func(request: Request):
+            request_body = await request.body()
+            body = json.loads(json.loads(request_body.decode()))
+            return await self.dispatch_rpc_request(instance, method, body)
+
     def build_router_from_instance(
         self,
         instance: OBORBase,

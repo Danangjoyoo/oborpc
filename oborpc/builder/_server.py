@@ -15,6 +15,12 @@ class ServerBuilder(OBORBuilder):
         """
         raise NotImplementedError("method should be overridden")
 
+    def create_remote_responder_async(self, instance, router, class_name, method_name, method): # pylint: disable=too-many-arguments
+        """
+        Remote RPC Request Responder Async
+        """
+        raise NotImplementedError("method should be overridden")
+
     def dispatch_rpc_request(self, instance, method, body):
         """
         Dispatch RPC Request
@@ -22,6 +28,15 @@ class ServerBuilder(OBORBuilder):
         args = body.get("args", [])
         kwargs = body.get("kwargs", {})
         res = method(instance, *args, **kwargs)
+        return {"data": res}
+
+    async def dispatch_rpc_request_async(self, instance, method, body):
+        """
+        Dispatch RPC Request
+        """
+        args = body.get("args", [])
+        kwargs = body.get("kwargs", {})
+        res = await method(instance, *args, **kwargs)
         return {"data": res}
 
     def setup_server_rpc(self, instance: object, router):
@@ -39,7 +54,14 @@ class ServerBuilder(OBORBuilder):
         for (name, method) in inspect.getmembers(iterator_class, predicate=inspect.isfunction):
             if name not in iterator_class.__oborprocedures__:
                 continue
-            self.create_remote_responder(
-                instance, router, iterator_class.__name__,
-                name, method_map.get(name)
-            )
+            method = method_map.get(name)
+            if inspect.iscoroutinefunction(method):
+                self.create_remote_responder_async(
+                    instance, router, iterator_class.__name__,
+                    name, method
+                )
+            else:
+                self.create_remote_responder(
+                    instance, router, iterator_class.__name__,
+                    name, method
+                )
