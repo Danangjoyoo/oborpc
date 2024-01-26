@@ -1,3 +1,6 @@
+# OBORPC
+[![Downloads](https://static.pepy.tech/personalized-badge/oborpc?period=total&units=international_system&left_color=black&right_color=orange&left_text=Downloads)](https://pepy.tech/project/oborpc)
+
 # Description
 An easy to build RPC based on Object Oriented Programming. Build your RPC in seconds. Built-in setup for FastAPI and Flask.
 
