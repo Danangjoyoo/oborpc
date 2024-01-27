@@ -42,7 +42,7 @@ class FastAPIServerBuilder(ServerBuilder):
         async def final_func(request: Request):
             request_body = await request.body()
             body = json.loads(json.loads(request_body.decode()))
-            return await self.dispatch_rpc_request(instance, method, body)
+            return await self.dispatch_rpc_request_async(instance, method, body)
 
     def build_router_from_instance(
         self,
