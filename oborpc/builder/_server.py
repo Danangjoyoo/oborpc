@@ -2,10 +2,9 @@
 Server Builder Base
 """
 import inspect
-from ._base import OBORBuilder
 
 
-class ServerBuilder(OBORBuilder):
+class ServerBuilder:
     """
     Server Builder
     """

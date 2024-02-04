@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 DESCRIPTION = "An easy setup object oriented RPC. Built-in setup for FastAPI and Flask"
 
 # Setting up
@@ -21,7 +21,7 @@ setup(
     long_description_content_type="text/markdown",
     long_description=long_description,
     packages=find_packages(),
-    install_requires=[],
+    install_requires=["httpx"],
     keywords=["fastapi", "flask", "rpc", "OOP"],
     classifiers=[
         "Development Status :: 3 - Alpha",
