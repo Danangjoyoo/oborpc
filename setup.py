@@ -21,7 +21,7 @@ setup(
     long_description_content_type="text/markdown",
     long_description=long_description,
     packages=find_packages(),
-    install_requires=[],
+    install_requires=["httpx"],
     keywords=["fastapi", "flask", "rpc", "OOP"],
     classifiers=[
         "Development Status :: 3 - Alpha",
