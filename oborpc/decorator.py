@@ -2,9 +2,11 @@
 OBORPC Decorator
 """
 import inspect
-from typing import Callable
+from typing import Any, Callable, TypeVar
 
-def procedure(fun: Callable):
+DecoratedCallable = TypeVar("DecoratedCallable", bound=Callable[..., Any])
+
+def procedure(fun: Callable) -> DecoratedCallable:
     """
     Marks the method with this decorator to make it available
     for RPC within the class with direct inheritance with `OBORBase`.

@@ -48,7 +48,7 @@ class FastAPIServerBuilder(ServerBuilder):
         self,
         instance: OBORBase,
         *,
-        prefix: str,
+        prefix: str = "",
         tags: Optional[List[Union[str, Enum]]] = None,
         dependencies: Optional[Sequence[params.Depends]] = None,
         default_response_class: Type[Response] = Default(JSONResponse),
@@ -65,6 +65,7 @@ class FastAPIServerBuilder(ServerBuilder):
         deprecated: Optional[bool] = None,
         include_in_schema: bool = True,
         generate_unique_id_function: Callable[[APIRoute], str] = Default(generate_unique_id),
+        secure_build: bool = True,
     ): # pylint: disable=too-many-arguments,too-many-locals
         """
         build FastAPI API Router from oborpc instance
@@ -89,6 +90,6 @@ class FastAPIServerBuilder(ServerBuilder):
             generate_unique_id_function=generate_unique_id_function
         )
 
-        self.setup_server_rpc(instance, router)
+        self.setup_server_rpc(instance, router, secure_build)
 
         return router

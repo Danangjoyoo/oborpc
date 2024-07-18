@@ -45,7 +45,8 @@ class FlaskServerBuilder(ServerBuilder):
         subdomain: Union[str, None] = None,
         url_defaults: Union[dict, None] = None,
         root_path: Union[str, None] = None,
-        cli_group: Union[str, None] = object()
+        cli_group: Union[str, None] = object(),
+        secure_build: bool = True,
     ): # pylint: disable=too-many-arguments
         """
         build Flask blueprint from oborpc instance
@@ -63,6 +64,6 @@ class FlaskServerBuilder(ServerBuilder):
             cli_group
         )
 
-        self.setup_server_rpc(instance, blueprint)
+        self.setup_server_rpc(instance, blueprint, secure_build)
 
         return blueprint
