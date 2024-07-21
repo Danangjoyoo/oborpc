@@ -24,7 +24,8 @@ class FlaskServerBuilder(ServerBuilder):
         def create_modified_func():
             @functools.wraps(method)
             def modified_func():
-                body = json.loads(flask_request.get_json())
+                request_body = flask_request.get_json()
+                body = json.loads(flask_request.get_json()) if request_body else {}
                 return self.dispatch_rpc_request(
                     instance, method, body
                 )
