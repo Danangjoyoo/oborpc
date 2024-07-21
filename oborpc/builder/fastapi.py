@@ -27,10 +27,7 @@ class FastAPIServerBuilder(ServerBuilder):
         @router.post(f"{router.prefix}/{class_name}/{method_name}")
         def final_func(request: Request):
             request_body = asyncio.run(request.body())
-            if request_body:
-                body = json.loads(json.loads(request_body.decode()))
-            else:
-                body = {}
+            body = json.loads(json.loads(request_body.decode()))
             return self.dispatch_rpc_request(instance, method, body)
 
     def create_remote_responder_async(
@@ -44,10 +41,7 @@ class FastAPIServerBuilder(ServerBuilder):
         @router.post(f"{router.prefix}/{class_name}/{method_name}")
         async def final_func(request: Request):
             request_body = await request.body()
-            if request_body:
-                body = json.loads(json.loads(request_body.decode()))
-            else:
-                body = {}
+            body = json.loads(json.loads(request_body.decode()))
             return await self.dispatch_rpc_request_async(instance, method, body)
 
     def build_router_from_instance(
