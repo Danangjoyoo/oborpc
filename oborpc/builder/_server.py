@@ -131,6 +131,8 @@ class ServerBuilder:
         return vars(model.validate_model(kwargs))
 
     def convert_model_response(self, response):
+        """
+        """
         if BaseModel.__subclasscheck__(response.__class__):
             return response.model_dump()
         return response
