@@ -4,7 +4,7 @@ Server Builder Base
 import inspect
 import pydantic_core
 from pydantic import BaseModel, create_model
-
+from typing import Any
 
 class ServerBuilder:
     """
@@ -111,13 +111,16 @@ class ServerBuilder:
 
         signature_params = inspect.signature(method).parameters
         params = {
-            k: (v.annotation, v.default if v.default != inspect._empty else ...)
-            for k, v in signature_params.items()
+            k: (
+                v.annotation if v.annotation != inspect._empty else Any,
+                v.default if v.default != inspect._empty else ...
+            ) for i, (k, v) in enumerate(signature_params.items())
+            if i != 0
         }
 
         self.model_maps[class_name][method_name] = [
-            list(signature_params.keys()),
-            create_model(f"{class_name}_{method_name}", params)
+            list(signature_params.keys())[1:],
+            create_model(f"{class_name}_{method_name}", **params)
         ]
 
     def construct_model_object(self, class_name, method_name, body):
@@ -128,7 +131,7 @@ class ServerBuilder:
         kwargs = body.get("kwargs", {})
         for i, arg in enumerate(args):
             kwargs[arg_keys[i]] = arg
-        return vars(model.validate_model(kwargs))
+        return vars(model.model_validate(kwargs))
 
     def convert_model_response(self, response):
         """

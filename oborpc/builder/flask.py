@@ -7,7 +7,7 @@ import os
 from typing import Callable, Union
 from flask import request as flask_request, Blueprint
 from ._server import ServerBuilder
-from ..base.meta import OBORBase
+from ..base.meta import RPCBase
 
 class FlaskServerBuilder(ServerBuilder):
     """
@@ -15,7 +15,7 @@ class FlaskServerBuilder(ServerBuilder):
     """
     def create_remote_responder(
         self,
-        instance: OBORBase,
+        instance: RPCBase,
         router: Blueprint,
         class_name: str,
         method_name: str,
@@ -32,7 +32,7 @@ class FlaskServerBuilder(ServerBuilder):
 
     def build_blueprint_from_instance(
         self,
-        instance: OBORBase,
+        instance: RPCBase,
         blueprint_name: str,
         import_name: str,
         static_folder: Union[str, os.PathLike, None] = None,

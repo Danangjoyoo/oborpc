@@ -1,4 +1,4 @@
 """
 OBORPC Bae
 """
-from .meta import OBORBase
+from .meta import RPCBase

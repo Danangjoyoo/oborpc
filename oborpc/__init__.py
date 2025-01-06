@@ -1,5 +1,5 @@
 """
 OBORPC Module
 """
-from .base import OBORBase
+from .base import RPCBase
 from .decorator import procedure

@@ -9,7 +9,7 @@ from fastapi import Request, Response, APIRouter, params
 from fastapi.responses import JSONResponse
 from fastapi.routing import BaseRoute, APIRoute, ASGIApp, Lifespan, Default, generate_unique_id
 from ._server import ServerBuilder
-from ..base.meta import OBORBase
+from ..base.meta import RPCBase
 
 
 class FastAPIServerBuilder(ServerBuilder):
@@ -18,7 +18,7 @@ class FastAPIServerBuilder(ServerBuilder):
     """
     def create_remote_responder(
         self,
-        instance: OBORBase,
+        instance: RPCBase,
         router: APIRouter,
         class_name: str,
         method_name: str,
@@ -35,7 +35,7 @@ class FastAPIServerBuilder(ServerBuilder):
 
     def create_remote_responder_async(
         self,
-        instance: OBORBase,
+        instance: RPCBase,
         router: APIRouter,
         class_name: str,
         method_name: str,
@@ -52,7 +52,7 @@ class FastAPIServerBuilder(ServerBuilder):
 
     def build_router_from_instance(
         self,
-        instance: OBORBase,
+        instance: RPCBase,
         *,
         prefix: str = "",
         tags: Optional[List[Union[str, Enum]]] = None,

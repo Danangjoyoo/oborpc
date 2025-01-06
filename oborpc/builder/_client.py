@@ -6,6 +6,7 @@ import json
 import logging
 import time
 import httpx
+import pydantic_core
 from pydantic import BaseModel, create_model
 from typing import Any, Dict, List
 
@@ -87,10 +88,7 @@ class ClientBuilder:
             """
             start_time = time.time()
             try:
-                data = {
-                    "args": self.convert_args_pydantic_model(args[1:]),
-                    "kwargs": self.convert_kwargs_pydantic_model(kwargs)
-                }
+                data = pydantic_core.to_jsonable_python({"args": args[1:], "kwargs": kwargs})
                 url = f"{url_prefix}/{class_name}/{method_name}"
                 response = self.request_client.post(
                     url=url,
@@ -138,10 +136,7 @@ class ClientBuilder:
             """
             start_time = time.time()
             try:
-                data = {
-                    "args": self.convert_args_pydantic_model(args[1:]),
-                    "kwargs": self.convert_kwargs_pydantic_model(kwargs)
-                }
+                data = pydantic_core.to_jsonable_python({"args": args[1:], "kwargs": kwargs})
                 url = f"{url_prefix}/{class_name}/{method_name}"
                 response = await self.async_request_client.post(
                     url=url,
@@ -204,30 +199,6 @@ class ClientBuilder:
             self.extract_models(class_name, name, method)
             setattr(_class, name, self.create_async_remote_caller(class_name, name, url_prefix))
 
-    def convert_args_pydantic_model(self, args: List[Any]):
-        """
-        """
-        final_object_list = []
-        for arg in args:
-            try:
-                if BaseModel.__subclasscheck__(arg):
-                    final_object_list.append(arg.model_dump())
-            except:
-                final_object_list.append(arg)
-        return final_object_list
-
-    def convert_kwargs_pydantic_model(self, kwargs: Dict[str, Any]):
-        """
-        """
-        final_kwargs = []
-        for kw, arg in kwargs.items():
-            try:
-                if BaseModel.__subclasscheck__(arg):
-                    final_kwargs[kw] = arg.model_dump()
-            except:
-                final_kwargs[kw] = arg
-        return final_kwargs
-
     def extract_models(self, class_name, method_name, method):
         """
         """
@@ -235,14 +206,16 @@ class ClientBuilder:
             self.model_maps[class_name] = {}
 
         signature_params = inspect.signature(method).parameters
-        signature_return = inspect.signature(method).return_annotation
         params = {
-            k: (v.annotation, v.default if v.default != inspect._empty else ...)
-            for k, v in signature_params.items()
+            k: (
+                v.annotation if v.annotation != inspect._empty else Any,
+                v.default if v.default != inspect._empty else ...
+            ) for k, v in signature_params.items()
         }
 
+        signature_return = inspect.signature(method).return_annotation
         self.model_maps[class_name][method_name] = [
-            create_model(f"{class_name}_{method_name}", params),
+            create_model(f"{class_name}_{method_name}", **params),
             signature_return
         ]
 
@@ -251,8 +224,8 @@ class ClientBuilder:
         """
         model, return_annotation = self.model_maps[class_name][method_name]
         try:
-            if BaseModel.__subclasscheck__(return_annotation):
-                return model.validate_model(response)
+            if BaseModel.__subclasscheck__(return_annotation.__class__):
+                return model.model_validate(response)
         except:
             pass
         return response
