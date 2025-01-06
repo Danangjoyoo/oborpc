@@ -6,6 +6,9 @@ import json
 import logging
 import time
 import httpx
+from pydantic import BaseModel, create_model
+from typing import Any, Dict, List
+
 from ..security import BASIC_AUTH_TOKEN
 from ..exception import OBORPCBuildException, RPCCallException
 
@@ -45,6 +48,9 @@ class ClientBuilder:
             headers=headers
         )
 
+        # model map
+        self.model_maps = {}
+
     def check_has_protocol(self, host: str):
         """
         Check whether the given host already defined with protocol or not
@@ -82,8 +88,8 @@ class ClientBuilder:
             start_time = time.time()
             try:
                 data = {
-                    "args": args[1:],
-                    "kwargs": kwargs
+                    "args": self.convert_args_pydantic_model(args[1:]),
+                    "kwargs": self.convert_kwargs_pydantic_model(kwargs)
                 }
                 url = f"{url_prefix}/{class_name}/{method_name}"
                 response = self.request_client.post(
@@ -96,7 +102,8 @@ class ClientBuilder:
                     msg = f"rpc call failed method={method_name}"
                     raise RPCCallException(msg)
 
-                return response.json().get("data")
+                data = response.json().get("data")
+                return self.convert_model_response(class_name, method_name, data)
 
             except Exception as e:
                 _retry = retry if retry is not None else self.retry
@@ -132,8 +139,8 @@ class ClientBuilder:
             start_time = time.time()
             try:
                 data = {
-                    "args": args[1:],
-                    "kwargs": kwargs
+                    "args": self.convert_args_pydantic_model(args[1:]),
+                    "kwargs": self.convert_kwargs_pydantic_model(kwargs)
                 }
                 url = f"{url_prefix}/{class_name}/{method_name}"
                 response = await self.async_request_client.post(
@@ -146,7 +153,8 @@ class ClientBuilder:
                     msg = f"rpc call failed method={method_name}"
                     raise RPCCallException(msg)
 
-                return response.json().get("data")
+                data = response.json().get("data")
+                return self.convert_model_response(class_name, method_name, data)
 
             except Exception as e:
                 _retry = retry if retry is not None else self.retry
@@ -164,7 +172,6 @@ class ClientBuilder:
 
         return async_remote_call
 
-
     def build_client_rpc(self, instance: object, url_prefix: str = ""):
         """
         Setup client rpc
@@ -174,10 +181,12 @@ class ClientBuilder:
 
         self.check_registered_base(_class)
 
-        for (name, _) in inspect.getmembers(iterator_class, predicate=inspect.isfunction):
+        for (name, method) in inspect.getmembers(iterator_class, predicate=inspect.isfunction):
             if name not in iterator_class.__oborprocedures__:
                 continue
-            setattr(_class, name, self.create_remote_caller(_class.__name__, name, url_prefix))
+            class_name = _class.__name__
+            self.extract_models(class_name, name, method)
+            setattr(_class, name, self.create_remote_caller(class_name, name, url_prefix))
 
     def build_async_client_rpc(self, instance: object, url_prefix: str = ""):
         """
@@ -188,7 +197,62 @@ class ClientBuilder:
 
         self.check_registered_base(_class)
 
-        for (name, _) in inspect.getmembers(iterator_class, predicate=inspect.isfunction):
+        for (name, method) in inspect.getmembers(iterator_class, predicate=inspect.isfunction):
             if name not in iterator_class.__oborprocedures__:
                 continue
-            setattr(_class, name, self.create_async_remote_caller(_class.__name__, name, url_prefix))
+            class_name = _class.__name__
+            self.extract_models(class_name, name, method)
+            setattr(_class, name, self.create_async_remote_caller(class_name, name, url_prefix))
+
+    def convert_args_pydantic_model(self, args: List[Any]):
+        """
+        """
+        final_object_list = []
+        for arg in args:
+            try:
+                if BaseModel.__subclasscheck__(arg):
+                    final_object_list.append(arg.model_dump())
+            except:
+                final_object_list.append(arg)
+        return final_object_list
+
+    def convert_kwargs_pydantic_model(self, kwargs: Dict[str, Any]):
+        """
+        """
+        final_kwargs = []
+        for kw, arg in kwargs.items():
+            try:
+                if BaseModel.__subclasscheck__(arg):
+                    final_kwargs[kw] = arg.model_dump()
+            except:
+                final_kwargs[kw] = arg
+        return final_kwargs
+
+    def extract_models(self, class_name, method_name, method):
+        """
+        """
+        if not class_name in self.model_maps:
+            self.model_maps[class_name] = {}
+
+        signature_params = inspect.signature(method).parameters
+        signature_return = inspect.signature(method).return_annotation
+        params = {
+            k: (v.annotation, v.default if v.default != inspect._empty else ...)
+            for k, v in signature_params.items()
+        }
+
+        self.model_maps[class_name][method_name] = [
+            create_model(f"{class_name}_{method_name}", params),
+            signature_return
+        ]
+
+    def convert_model_response(self, class_name, method_name, response):
+        """
+        """
+        model, return_annotation = self.model_maps[class_name][method_name]
+        try:
+            if BaseModel.__subclasscheck__(return_annotation):
+                return model.validate_model(response)
+        except:
+            pass
+        return response

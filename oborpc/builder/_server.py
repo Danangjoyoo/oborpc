@@ -2,12 +2,17 @@
 Server Builder Base
 """
 import inspect
+import pydantic_core
+from pydantic import BaseModel, create_model
 
 
 class ServerBuilder:
     """
     Server Builder
     """
+    def __init__(self) -> None:
+        self.model_maps = {}
+
     def create_remote_responder(self, instance, router, class_name, method_name, method): # pylint: disable=too-many-arguments
         """
         Remote RPC Request Responder
@@ -20,23 +25,21 @@ class ServerBuilder:
         """
         raise NotImplementedError("method should be overridden")
 
-    def dispatch_rpc_request(self, instance, method, body):
+    def dispatch_rpc_request(self, class_name, method_name, instance, method, body):
         """
         Dispatch RPC Request
         """
-        args = body.get("args", [])
-        kwargs = body.get("kwargs", {})
-        res = method(instance, *args, **kwargs)
-        return {"data": res}
+        kwargs = self.construct_model_object(class_name, method_name, body)
+        res = method(instance, **kwargs)
+        return {"data": self.convert_model_response(res)}
 
-    async def dispatch_rpc_request_async(self, instance, method, body):
+    async def dispatch_rpc_request_async(self, class_name, method_name, instance, method, body):
         """
         Dispatch RPC Request
         """
-        args = body.get("args", [])
-        kwargs = body.get("kwargs", {})
-        res = await method(instance, *args, **kwargs)
-        return {"data": res}
+        kwargs = self.construct_model_object(class_name, method_name, body)
+        res = await method(instance, **kwargs)
+        return {"data": self.convert_model_response(res)}
 
     def setup_server_rpc(self, instance: object, router, secure_build: bool = True):
         """
@@ -67,16 +70,12 @@ class ServerBuilder:
                 self.validate_implementation(name, method, _class, iterator_method, iterator_class)
 
             # build router
+            class_name = iterator_class.__name__
+            self.extract_models(class_name, name, method)
             if inspect.iscoroutinefunction(method):
-                self.create_remote_responder_async(
-                    instance, router, iterator_class.__name__,
-                    name, method
-                )
+                self.create_remote_responder_async(instance, router, class_name, name, method)
             else:
-                self.create_remote_responder(
-                    instance, router, iterator_class.__name__,
-                    name, method
-                )
+                self.create_remote_responder(instance, router, class_name, name, method)
 
     def validate_implementation(
         self,
@@ -103,3 +102,35 @@ class ServerBuilder:
             f"While the origin `{iterator_origin}.{method_name}()` is defined as `{callable_type[int(is_origin_coroutine)]}`."
         )
         assert is_implementation_coroutine == is_origin_coroutine, err
+
+    def extract_models(self, class_name, method_name, method):
+        """
+        """
+        if not class_name in self.model_maps:
+            self.model_maps[class_name] = {}
+
+        signature_params = inspect.signature(method).parameters
+        params = {
+            k: (v.annotation, v.default if v.default != inspect._empty else ...)
+            for k, v in signature_params.items()
+        }
+
+        self.model_maps[class_name][method_name] = [
+            list(signature_params.keys()),
+            create_model(f"{class_name}_{method_name}", params)
+        ]
+
+    def construct_model_object(self, class_name, method_name, body):
+        """
+        """
+        arg_keys, model = self.model_maps[class_name][method_name]
+        args = body.get("args", [])
+        kwargs = body.get("kwargs", {})
+        for i, arg in enumerate(args):
+            kwargs[arg_keys[i]] = arg
+        return vars(model.validate_model(kwargs))
+
+    def convert_model_response(self, response):
+        if BaseModel.__subclasscheck__(response.__class__):
+            return response.model_dump()
+        return response

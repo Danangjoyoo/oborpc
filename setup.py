@@ -21,7 +21,7 @@ setup(
     long_description_content_type="text/markdown",
     long_description=long_description,
     packages=find_packages(),
-    install_requires=["httpx"],
+    install_requires=["httpx", "pydantic"],
     keywords=["fastapi", "flask", "rpc", "OOP"],
     classifiers=[
         "Development Status :: 3 - Alpha",

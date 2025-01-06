@@ -26,13 +26,9 @@ class FlaskServerBuilder(ServerBuilder):
             def modified_func():
                 request_body = flask_request.get_json()
                 body = json.loads(flask_request.get_json()) if request_body else {}
-                return self.dispatch_rpc_request(
-                    instance, method, body
-                )
+                return self.dispatch_rpc_request(class_name, method_name, instance, method, body)
             return modified_func
-        router.post(
-            f"{router.url_prefix or ''}/{class_name}/{method_name}"
-        )(create_modified_func())
+        router.post(f"{router.url_prefix or ''}/{class_name}/{method_name}")(create_modified_func())
 
     def build_blueprint_from_instance(
         self,
