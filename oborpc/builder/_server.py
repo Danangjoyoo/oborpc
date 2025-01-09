@@ -85,12 +85,15 @@ class ServerBuilder:
 
     def validate_implementation(
         self,
-        method_name,
-        implementation_method,
-        implementation_class,
-        origin_method,
-        origin_class,
+        method_name: str,
+        implementation_method: Callable,
+        implementation_class: object,
+        origin_method: Callable,
+        origin_class: object,
     ):
+        """
+        Validate implementation of RPC super class
+        """
         # validate implementation: check overridden procedure
         method_str = str(implementation_method)
         method_origin = method_str[9:method_str.find(" at 0x")].split(".")[0].strip()
@@ -113,6 +116,7 @@ class ServerBuilder:
 
     def extract_models(self, class_name: str, method_name: str, method: Callable):
         """
+        Extract pydantic models from method signature for both spec and returns
         """
         if not class_name in self.model_maps:
             self.model_maps[class_name] = {}
@@ -153,6 +157,7 @@ class ServerBuilder:
         body: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
+        Construct pydantic object with the declared model and the given request body
         """
         arg_keys, kwargs_model, _, _ = self.model_maps[class_name][method_name]
         args = body.get("args", [])
@@ -163,6 +168,7 @@ class ServerBuilder:
 
     def convert_model_response(self, response: Dict[str, Any]) -> Dict[str, Any]:
         """
+        Convert response into pydantic model if possible
         """
         if BaseModel.__subclasscheck__(response.__class__):
             return response.model_dump()

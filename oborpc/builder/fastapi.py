@@ -23,6 +23,7 @@ class FastAPIServerBuilder(ServerBuilder):
     """
     def generate_model_schema(self, model: Optional[BaseModel]) -> Dict[str, Any]:
         """
+        Generate pydantic model schema
         """
         try:
             if not model:
@@ -37,6 +38,7 @@ class FastAPIServerBuilder(ServerBuilder):
 
     def generate_openapi_extra_body(self, class_name: str, method_name: str) -> Dict[str, Any]:
         """
+        Generate OpenAPI Extra Body for Schema
         """
         # request schema
         model = self.model_maps[class_name][method_name][2]
