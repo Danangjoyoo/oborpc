@@ -81,6 +81,7 @@ class FastAPIServerBuilder(ServerBuilder):
     ): # pylint: disable=too-many-positional-arguments
         @router.post(
             f"{router.prefix}/{class_name}/{method_name}",
+            tags=[class_name],
             openapi_extra=self.generate_openapi_extra_body(class_name, method_name)
         )
         def rpc_function(request: Request):
@@ -105,6 +106,7 @@ class FastAPIServerBuilder(ServerBuilder):
     ): # pylint: disable=too-many-positional-arguments,too-many-arguments,too-many-arguments
         @router.post(
             f"{router.prefix}/{class_name}/{method_name}",
+            tags=[class_name],
             openapi_extra=self.generate_openapi_extra_body(class_name, method_name)
         )
         async def rpc_function(request: Request):
