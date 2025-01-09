@@ -13,19 +13,19 @@ class ServerBuilder:
     def __init__(self) -> None:
         self.model_maps: Dict[str, Dict[str, Any]] = {}
 
-    def create_remote_responder(self, instance, router, class_name, method_name, method): # pylint: disable=too-many-arguments
+    def create_remote_responder(self, instance, router, class_name, method_name, method): # pylint: disable=too-many-arguments,too-many-positional-arguments
         """
         Remote RPC Request Responder
         """
         raise NotImplementedError("method should be overridden")
 
-    def create_remote_responder_async(self, instance, router, class_name, method_name, method): # pylint: disable=too-many-arguments
+    def create_remote_responder_async(self, instance, router, class_name, method_name, method): # pylint: disable=too-many-arguments,too-many-positional-arguments
         """
         Remote RPC Request Responder Async
         """
         raise NotImplementedError("method should be overridden")
 
-    def dispatch_rpc_request(self, class_name, method_name, instance, method, body): # pylint: disable=too-many-arguments
+    def dispatch_rpc_request(self, class_name, method_name, instance, method, body): # pylint: disable=too-many-arguments,too-many-positional-arguments
         """
         Dispatch RPC Request
         """
@@ -33,7 +33,7 @@ class ServerBuilder:
         res = method(instance, **kwargs)
         return {"data": self.convert_model_response(res)}
 
-    async def dispatch_rpc_request_async(self, class_name, method_name, instance, method, body): # pylint: disable=too-many-arguments
+    async def dispatch_rpc_request_async(self, class_name, method_name, instance, method, body): # pylint: disable=too-many-arguments,too-many-positional-arguments
         """
         Dispatch RPC Request
         """

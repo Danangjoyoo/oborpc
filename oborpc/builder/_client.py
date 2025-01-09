@@ -13,8 +13,7 @@ import httpx
 import pydantic_core
 from pydantic import BaseModel, create_model
 
-
-import logging
+# httpx log level
 httpx_logger = logging.getLogger("httpx")
 httpx_logger.setLevel(logging.WARNING)
 
