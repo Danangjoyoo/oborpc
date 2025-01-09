@@ -95,7 +95,7 @@ class FastAPIServerBuilder(ServerBuilder):
                 body = {}
             return self.dispatch_rpc_request(class_name, method_name, instance, method, body)
 
-    def create_remote_responder_async(
+    def create_remote_responder_async( # pylint: disable=too-many-positional-arguments
         self,
         instance: RPCBase,
         router: APIRouter,
