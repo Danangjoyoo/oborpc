@@ -7,7 +7,7 @@ import os
 from typing import Callable, Union
 from flask import request as flask_request, Blueprint
 from ._server import ServerBuilder
-from ..base.meta import OBORBase
+from ..base.meta import RPCBase
 
 class FlaskServerBuilder(ServerBuilder):
     """
@@ -15,7 +15,7 @@ class FlaskServerBuilder(ServerBuilder):
     """
     def create_remote_responder(
         self,
-        instance: OBORBase,
+        instance: RPCBase,
         router: Blueprint,
         class_name: str,
         method_name: str,
@@ -26,17 +26,13 @@ class FlaskServerBuilder(ServerBuilder):
             def modified_func():
                 request_body = flask_request.get_json()
                 body = json.loads(flask_request.get_json()) if request_body else {}
-                return self.dispatch_rpc_request(
-                    instance, method, body
-                )
+                return self.dispatch_rpc_request(class_name, method_name, instance, method, body)
             return modified_func
-        router.post(
-            f"{router.url_prefix or ''}/{class_name}/{method_name}"
-        )(create_modified_func())
+        router.post(f"{router.url_prefix or ''}/{class_name}/{method_name}")(create_modified_func())
 
     def build_blueprint_from_instance(
         self,
-        instance: OBORBase,
+        instance: RPCBase,
         blueprint_name: str,
         import_name: str,
         static_folder: Union[str, os.PathLike, None] = None,

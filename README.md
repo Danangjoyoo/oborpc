@@ -15,7 +15,7 @@ pip install oborpc
 from oborpc.base import meta
 from oborpc.decorator import procedure
 
-class Calculator(meta.OBORBase):
+class Calculator(meta.RPCBase):
     @procedure
     def add(self, a: int, b: int):
         pass
