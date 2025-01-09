@@ -14,6 +14,11 @@ import pydantic_core
 from pydantic import BaseModel, create_model
 
 
+import logging
+httpx_logger = logging.getLogger("httpx")
+httpx_logger.setLevel(logging.WARNING)
+
+
 class ClientBuilder:
     """
     Client Builder
