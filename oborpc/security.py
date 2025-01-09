@@ -14,8 +14,14 @@ def validate_rpc_response(response: httpx.Response):
         return False
 
     try:
-        valid_content_type = response.headers.get("content-type", "").lower() == "application/json"
-        valid_token = response.headers.get("authorization", "").lower() == f"basic {BASIC_AUTH_TOKEN}"
+        valid_content_type = (
+            response.headers.get("content-type", "").lower()
+            == "application/json"
+        )
+        valid_token = (
+            response.headers.get("authorization", "").lower()
+            == f"basic {BASIC_AUTH_TOKEN}"
+        )
         return valid_content_type and valid_token
     except:
         return False

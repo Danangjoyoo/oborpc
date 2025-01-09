@@ -3,15 +3,18 @@ FastAPI Server Builder
 """
 import json
 import asyncio
-import jsonref
 from enum import Enum
 from typing import Optional, List, Dict, Union, Type, Any, Sequence, Callable
+
+import jsonref
+from pydantic import BaseModel
 from fastapi import Request, Response, APIRouter, params
 from fastapi.responses import JSONResponse
 from fastapi.routing import BaseRoute, APIRoute, ASGIApp, Lifespan, Default, generate_unique_id
+
 from ._server import ServerBuilder
 from ..base.meta import RPCBase
-from pydantic import BaseModel
+
 
 
 class FastAPIServerBuilder(ServerBuilder):

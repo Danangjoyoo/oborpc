@@ -24,7 +24,7 @@ class ServerBuilder:
         """
         raise NotImplementedError("method should be overridden")
 
-    def dispatch_rpc_request(self, class_name, method_name, instance, method, body):
+    def dispatch_rpc_request(self, class_name, method_name, instance, method, body): # pylint: disable=too-many-arguments
         """
         Dispatch RPC Request
         """
@@ -32,7 +32,7 @@ class ServerBuilder:
         res = method(instance, **kwargs)
         return {"data": self.convert_model_response(res)}
 
-    async def dispatch_rpc_request_async(self, class_name, method_name, instance, method, body):
+    async def dispatch_rpc_request_async(self, class_name, method_name, instance, method, body): # pylint: disable=too-many-arguments
         """
         Dispatch RPC Request
         """
@@ -66,7 +66,13 @@ class ServerBuilder:
             method = method_map.get(name)
             iterator_method = iterator_method_map.get(name)
             if secure_build:
-                self.validate_implementation(name, method, _class, iterator_method, iterator_class)
+                self.validate_implementation(
+                    name,
+                    method,
+                    _class,
+                    iterator_method,
+                    iterator_class
+                )
 
             # build router
             class_name = iterator_class.__name__
@@ -97,8 +103,10 @@ class ServerBuilder:
         callable_type = ["def", "async def"]
         iterator_origin = str(origin_class)[8:-2].split(".")[-1].strip()
         err = (
-            f"Unable to build. Procedure `{implementation_origin}.{method_name}()` is implemented as `{callable_type[int(is_implementation_coroutine)]}`. "
-            f"While the origin `{iterator_origin}.{method_name}()` is defined as `{callable_type[int(is_origin_coroutine)]}`."
+            f"Unable to build. Procedure `{implementation_origin}.{method_name}()` "
+            "is implemented as `{callable_type[int(is_implementation_coroutine)]}`. "
+            f"While the origin `{iterator_origin}.{method_name}()` is defined as "
+            "`{callable_type[int(is_origin_coroutine)]}`."
         )
         assert is_implementation_coroutine == is_origin_coroutine, err
 
@@ -126,7 +134,8 @@ class ServerBuilder:
         request_model = create_model(f"{class_name}_{method_name}_request", **request_premodel)
 
         # response signature
-        return_annot = signature.return_annotation if signature.return_annotation != inspect._empty else Any
+        return_annot = signature.return_annotation
+        return_annot = return_annot if return_annot != inspect._empty else Any
         response_params = {"data": (return_annot, ...)}
 
         self.model_maps[class_name][method_name] = [
@@ -136,10 +145,15 @@ class ServerBuilder:
             create_model(f"{class_name}_{method_name}_reponse", **response_params)
         ]
 
-    def construct_model_object(self, class_name: str, method_name: str, body: Dict[str, Any]) -> Dict[str, Any]:
+    def construct_model_object(
+        self,
+        class_name: str,
+        method_name: str,
+        body: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         """
-        arg_keys, kwargs_model, request_model, response_model = self.model_maps[class_name][method_name]
+        arg_keys, kwargs_model, _, _ = self.model_maps[class_name][method_name]
         args = body.get("args", [])
         kwargs = body.get("kwargs", {})
         for i, arg in enumerate(args):
