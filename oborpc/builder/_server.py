@@ -90,7 +90,7 @@ class ServerBuilder:
         implementation_class: object,
         origin_method: Callable,
         origin_class: object,
-    ):
+    ): # pylint: disable=too-many-arguments,too-many-positional-arguments
         """
         Validate implementation of RPC super class
         """

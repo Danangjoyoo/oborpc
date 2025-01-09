@@ -6,12 +6,12 @@ import logging
 import time
 from typing import Any, Callable, Dict
 
-from ..security import BASIC_AUTH_TOKEN
-from ..exception import OBORPCBuildException, RPCCallException
-
 import httpx
 import pydantic_core
 from pydantic import BaseModel, create_model
+
+from ..security import BASIC_AUTH_TOKEN
+from ..exception import OBORPCBuildException, RPCCallException
 
 # httpx log level
 httpx_logger = logging.getLogger("httpx")
