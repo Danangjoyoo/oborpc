@@ -2,8 +2,9 @@
 Server Builder Base
 """
 import inspect
-from pydantic import BaseModel, create_model
 from typing import Any, Callable, Dict, List
+
+from pydantic import BaseModel, create_model
 
 class ServerBuilder:
     """

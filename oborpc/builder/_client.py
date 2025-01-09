@@ -2,16 +2,16 @@
 Client RPC Builder
 """
 import inspect
-import json
 import logging
 import time
-import httpx
-import pydantic_core
-from pydantic import BaseModel, create_model
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict
 
 from ..security import BASIC_AUTH_TOKEN
 from ..exception import OBORPCBuildException, RPCCallException
+
+import httpx
+import pydantic_core
+from pydantic import BaseModel, create_model
 
 
 class ClientBuilder:
