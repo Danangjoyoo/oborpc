@@ -6,12 +6,16 @@ import logging
 import time
 from typing import Any, Callable, Dict
 
-from ..security import BASIC_AUTH_TOKEN
-from ..exception import OBORPCBuildException, RPCCallException
-
 import httpx
 import pydantic_core
 from pydantic import BaseModel, create_model
+
+from ..security import BASIC_AUTH_TOKEN
+from ..exception import OBORPCBuildException, RPCCallException
+
+# httpx log level
+httpx_logger = logging.getLogger("httpx")
+httpx_logger.setLevel(logging.WARNING)
 
 
 class ClientBuilder:
@@ -78,7 +82,7 @@ class ClientBuilder:
         url_prefix: str,
         timeout: float = None,
         retry: int = None
-    ): # pylint: disable=too-many-arguments
+    ): # pylint: disable=too-many-arguments,too-many-positional-arguments
         """
         create remote caller
         """
@@ -128,7 +132,7 @@ class ClientBuilder:
         url_prefix: str,
         timeout: float = None,
         retry: int = None
-    ): # pylint: disable=too-many-arguments
+    ): # pylint: disable=too-many-arguments,too-many-positional-arguments
         """
         create async remote caller
         """
@@ -208,6 +212,7 @@ class ClientBuilder:
         method: Callable
     ):
         """
+        Extract pydantic model
         """
         if not class_name in self.model_maps:
             self.model_maps[class_name] = {}
@@ -233,6 +238,7 @@ class ClientBuilder:
         response: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
+        Convert Pydantic Model Response
         """
         model, return_annotation = self.model_maps[class_name][method_name]
         try:
