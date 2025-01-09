@@ -8,7 +8,7 @@ import time
 import httpx
 import pydantic_core
 from pydantic import BaseModel, create_model
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
 from ..security import BASIC_AUTH_TOKEN
 from ..exception import OBORPCBuildException, RPCCallException
@@ -88,11 +88,13 @@ class ClientBuilder:
             """
             start_time = time.time()
             try:
-                data = pydantic_core.to_jsonable_python({"args": args[1:], "kwargs": kwargs})
                 url = f"{url_prefix}/{class_name}/{method_name}"
                 response = self.request_client.post(
                     url=url,
-                    json=json.dumps(data),
+                    json=pydantic_core.to_jsonable_python({
+                        "args": args[1:],
+                        "kwargs": kwargs
+                    }),
                     timeout=timeout if timeout is not None else self.timeout
                 )
 
@@ -140,7 +142,7 @@ class ClientBuilder:
                 url = f"{url_prefix}/{class_name}/{method_name}"
                 response = await self.async_request_client.post(
                     url=url,
-                    json=json.dumps(data),
+                    json=data,
                     timeout=timeout if timeout is not None else self.timeout
                 )
 
@@ -199,7 +201,12 @@ class ClientBuilder:
             self.extract_models(class_name, name, method)
             setattr(_class, name, self.create_async_remote_caller(class_name, name, url_prefix))
 
-    def extract_models(self, class_name, method_name, method):
+    def extract_models(
+        self,
+        class_name: str,
+        method_name: str,
+        method: Callable
+    ):
         """
         """
         if not class_name in self.model_maps:
@@ -219,7 +226,12 @@ class ClientBuilder:
             signature_return
         ]
 
-    def convert_model_response(self, class_name, method_name, response):
+    def convert_model_response(
+        self,
+        class_name: str,
+        method_name: str,
+        response: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         """
         model, return_annotation = self.model_maps[class_name][method_name]

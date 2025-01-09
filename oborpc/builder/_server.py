@@ -2,16 +2,15 @@
 Server Builder Base
 """
 import inspect
-import pydantic_core
 from pydantic import BaseModel, create_model
-from typing import Any
+from typing import Any, Callable, Dict, List
 
 class ServerBuilder:
     """
     Server Builder
     """
     def __init__(self) -> None:
-        self.model_maps = {}
+        self.model_maps: Dict[str, Dict[str, Any]] = {}
 
     def create_remote_responder(self, instance, router, class_name, method_name, method): # pylint: disable=too-many-arguments
         """
@@ -103,37 +102,51 @@ class ServerBuilder:
         )
         assert is_implementation_coroutine == is_origin_coroutine, err
 
-    def extract_models(self, class_name, method_name, method):
+    def extract_models(self, class_name: str, method_name: str, method: Callable):
         """
         """
         if not class_name in self.model_maps:
             self.model_maps[class_name] = {}
 
-        signature_params = inspect.signature(method).parameters
-        params = {
+        signature = inspect.signature(method)
+
+        # request signature
+        request_params = {
             k: (
                 v.annotation if v.annotation != inspect._empty else Any,
                 v.default if v.default != inspect._empty else ...
-            ) for i, (k, v) in enumerate(signature_params.items())
+            ) for i, (k, v) in enumerate(signature.parameters.items())
             if i != 0
         }
+        kwargs_model = create_model(f"{class_name}_{method_name}_request_kwargs", **request_params)
+        request_premodel = {
+            "args": (List[Any], []),
+            "kwargs": (kwargs_model, ...)
+        }
+        request_model = create_model(f"{class_name}_{method_name}_request", **request_premodel)
+
+        # response signature
+        return_annot = signature.return_annotation if signature.return_annotation != inspect._empty else Any
+        response_params = {"data": (return_annot, ...)}
 
         self.model_maps[class_name][method_name] = [
-            list(signature_params.keys())[1:],
-            create_model(f"{class_name}_{method_name}", **params)
+            list(signature.parameters.keys())[1:],
+            kwargs_model,
+            request_model,
+            create_model(f"{class_name}_{method_name}_reponse", **response_params)
         ]
 
-    def construct_model_object(self, class_name, method_name, body):
+    def construct_model_object(self, class_name: str, method_name: str, body: Dict[str, Any]) -> Dict[str, Any]:
         """
         """
-        arg_keys, model = self.model_maps[class_name][method_name]
+        arg_keys, kwargs_model, request_model, response_model = self.model_maps[class_name][method_name]
         args = body.get("args", [])
         kwargs = body.get("kwargs", {})
         for i, arg in enumerate(args):
             kwargs[arg_keys[i]] = arg
-        return vars(model.model_validate(kwargs))
+        return vars(kwargs_model.model_validate(kwargs))
 
-    def convert_model_response(self, response):
+    def convert_model_response(self, response: Dict[str, Any]) -> Dict[str, Any]:
         """
         """
         if BaseModel.__subclasscheck__(response.__class__):
