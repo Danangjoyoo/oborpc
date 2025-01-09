@@ -24,7 +24,7 @@ setup(
     install_requires=["httpx", "pydantic", "jsonref"],
     keywords=["fastapi", "flask", "rpc", "OOP"],
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
