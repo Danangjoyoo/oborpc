@@ -112,7 +112,11 @@ class FastAPIServerBuilder(ServerBuilder):
         async def rpc_function(request: Request):
             request_body = await request.body()
             if request_body:
-                body = json.loads(json.loads(request_body.decode()))
+                decoded_request_body = json.loads(request_body.decode())
+                if isinstance(decoded_request_body, str):
+                    body = json.loads(decoded_request_body)
+                else:
+                    body = decoded_request_body
             else:
                 body = {}
             return await self.dispatch_rpc_request_async(class_name, method_name, instance, method, body)
