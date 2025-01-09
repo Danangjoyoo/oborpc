@@ -33,7 +33,7 @@ class FastAPIServerBuilder(ServerBuilder):
             if "$defs" in openapi_schema:
                 openapi_schema.pop("$defs")
             return openapi_schema
-        except:
+        except: # pylint: disable=bare-except
             return {}
 
     def generate_openapi_extra_body(self, class_name: str, method_name: str) -> Dict[str, Any]:
@@ -78,7 +78,7 @@ class FastAPIServerBuilder(ServerBuilder):
         class_name: str,
         method_name: str,
         method: Callable
-    ): # pylint: disable=too-many-arguments
+    ): # pylint: disable=too-many-positional-arguments
         @router.post(
             f"{router.prefix}/{class_name}/{method_name}",
             openapi_extra=self.generate_openapi_extra_body(class_name, method_name)
@@ -102,7 +102,7 @@ class FastAPIServerBuilder(ServerBuilder):
         class_name: str,
         method_name: str,
         method: Callable
-    ): # pylint: disable=too-many-arguments
+    ): # pylint: disable=too-many-positional-arguments
         @router.post(
             f"{router.prefix}/{class_name}/{method_name}",
             openapi_extra=self.generate_openapi_extra_body(class_name, method_name)
