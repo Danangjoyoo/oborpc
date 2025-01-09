@@ -95,14 +95,14 @@ class FastAPIServerBuilder(ServerBuilder):
                 body = {}
             return self.dispatch_rpc_request(class_name, method_name, instance, method, body)
 
-    def create_remote_responder_async( # pylint: disable=too-many-positional-arguments
+    def create_remote_responder_async(
         self,
         instance: RPCBase,
         router: APIRouter,
         class_name: str,
         method_name: str,
         method: Callable
-    ): # pylint: disable=too-many-positional-arguments
+    ): # pylint: disable=too-many-positional-arguments,too-many-arguments,too-many-arguments
         @router.post(
             f"{router.prefix}/{class_name}/{method_name}",
             openapi_extra=self.generate_openapi_extra_body(class_name, method_name)
@@ -137,7 +137,7 @@ class FastAPIServerBuilder(ServerBuilder):
         include_in_schema: bool = True,
         generate_unique_id_function: Callable[[APIRoute], str] = Default(generate_unique_id),
         secure_build: bool = True,
-    ): # pylint: disable=too-many-arguments,too-many-locals
+    ): # pylint: disable=too-many-positional-arguments,too-many-arguments,too-many-locals
         """
         build FastAPI API Router from oborpc instance
         """
