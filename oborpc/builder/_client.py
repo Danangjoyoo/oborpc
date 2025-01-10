@@ -30,7 +30,8 @@ class ClientBuilder:
         port: Optional[Union[str, int]] = None,
         timeout: Optional[float] = None,
         retry: Optional[int] = None,
-        additional_headers: Optional[Dict[str, str]] = None
+        additional_headers: Optional[Dict[str, str]] = None,
+        dynamic_headers_builder: Optional[Callable] = None,
     ): # pylint: disable=too-many-arguments,too-many-positional-arguments
         self.master_instances = []
         self.host = host
@@ -46,14 +47,19 @@ class ClientBuilder:
         if port:
             self.base_url += f":{port}"
 
-        # request client
+        # dynamic header
+        self.dynamic_headers_builder = dynamic_headers_builder or (lambda: {})
+
+        # static header
         headers = {
             "Authorization": f"Basic {BASIC_AUTH_TOKEN}",
             "Content-Type": "application/json"
         }
         if additional_headers:
             headers.update(additional_headers)
+        self.headers = headers
 
+        # request client
         self.request_client = httpx.Client(
             base_url=self.base_url,
             headers=headers
@@ -103,13 +109,16 @@ class ClientBuilder:
             start_time = time.time()
             try:
                 url = f"{url_prefix}/{class_name}/{method_name}"
+                headers = self.headers.copy()
+                headers.update(self.dynamic_headers_builder())
                 response = self.request_client.post(
                     url=url,
                     json=pydantic_core.to_jsonable_python({
                         "args": args[1:],
                         "kwargs": kwargs
                     }),
-                    timeout=timeout if timeout is not None else self.timeout
+                    timeout=timeout if timeout is not None else self.timeout,
+                    headers=headers
                 )
 
                 if not response:
@@ -154,10 +163,13 @@ class ClientBuilder:
             try:
                 data = pydantic_core.to_jsonable_python({"args": args[1:], "kwargs": kwargs})
                 url = f"{url_prefix}/{class_name}/{method_name}"
+                headers = self.headers.copy()
+                headers.update(self.dynamic_headers_builder())
                 response = await self.async_request_client.post(
                     url=url,
                     json=data,
-                    timeout=timeout if timeout is not None else self.timeout
+                    timeout=timeout if timeout is not None else self.timeout,
+                    headers=headers
                 )
 
                 if not response:
