@@ -48,7 +48,7 @@ class ClientBuilder:
             self.base_url += f":{port}"
 
         # dynamic header
-        self.dynamic_headers_builder = dynamic_headers_builder
+        self.dynamic_headers_builder = dynamic_headers_builder or (lambda: {})
 
         # static header
         headers = {
