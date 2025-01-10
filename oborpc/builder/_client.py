@@ -4,7 +4,7 @@ Client RPC Builder
 import inspect
 import logging
 import time
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Optional, Union
 
 import httpx
 import pydantic_core
@@ -27,10 +27,10 @@ class ClientBuilder:
     def __init__(
         self,
         host: str,
-        port: str | int | None = None,
-        timeout: float | None = None,
-        retry: int | None = None,
-        additional_headers: Dict[str, str] | None = None
+        port: Optional[Union[str, int]] = None,
+        timeout: Optional[float] = None,
+        retry: Optional[int] = None,
+        additional_headers: Optional[Dict[str, str]] = None
     ): # pylint: disable=too-many-arguments,too-many-positional-arguments
         self.master_instances = []
         self.host = host
