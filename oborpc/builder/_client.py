@@ -4,7 +4,7 @@ Client RPC Builder
 import inspect
 import logging
 import time
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Optional, Union
 
 import httpx
 import pydantic_core
@@ -24,12 +24,19 @@ class ClientBuilder:
     """
     __registered_base = set()
 
-    def __init__(self, host, port=None, timeout=1, retry=0) -> None:
+    def __init__(
+        self,
+        host: str,
+        port: Optional[Union[str, int]] = None,
+        timeout: Optional[float] = None,
+        retry: Optional[int] = None,
+        additional_headers: Optional[Dict[str, str]] = None
+    ): # pylint: disable=too-many-arguments,too-many-positional-arguments
         self.master_instances = []
         self.host = host
         self.port = port
-        self.timeout = timeout
-        self.retry = retry
+        self.timeout = timeout or 1
+        self.retry = retry or 0
 
         protocol = "http://"
         if self.check_has_protocol(host):
@@ -44,6 +51,9 @@ class ClientBuilder:
             "Authorization": f"Basic {BASIC_AUTH_TOKEN}",
             "Content-Type": "application/json"
         }
+        if additional_headers:
+            headers.update(additional_headers)
+
         self.request_client = httpx.Client(
             base_url=self.base_url,
             headers=headers

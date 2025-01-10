@@ -108,9 +108,9 @@ class ServerBuilder:
         iterator_origin = str(origin_class)[8:-2].split(".")[-1].strip()
         err = (
             f"Unable to build. Procedure `{implementation_origin}.{method_name}()` "
-            "is implemented as `{callable_type[int(is_implementation_coroutine)]}`. "
+            f"is implemented as `{callable_type[int(is_implementation_coroutine)]}`. "
             f"While the origin `{iterator_origin}.{method_name}()` is defined as "
-            "`{callable_type[int(is_origin_coroutine)]}`."
+            f"`{callable_type[int(is_origin_coroutine)]}`."
         )
         assert is_implementation_coroutine == is_origin_coroutine, err
 

@@ -20,7 +20,7 @@ class FlaskServerBuilder(ServerBuilder):
         class_name: str,
         method_name: str,
         method: Callable
-    ): # pylint: disable=too-many-arguments
+    ): # pylint: disable=too-many-arguments,too-many-positional-arguments
         def create_modified_func():
             @functools.wraps(method)
             def modified_func():
@@ -44,7 +44,7 @@ class FlaskServerBuilder(ServerBuilder):
         root_path: Union[str, None] = None,
         cli_group: Union[str, None] = object(),
         secure_build: bool = True,
-    ): # pylint: disable=too-many-arguments
+    ): # pylint: disable=too-many-arguments,too-many-positional-arguments
         """
         build Flask blueprint from oborpc instance
         """
